@@ -2,30 +2,6 @@ import React, { createContext, useContext, useState } from 'react';
 
 const TreeContext = createContext();
 
-const exportToPython = (node) => {
-  let code = "";
-
-  const traverse = (node, depth = 0) => {
-    if (!node || !node.children || node.children.length === 0) {
-      code += "    ".repeat(depth) + `# Action for ${node.label}\n`;
-      return;
-    }
-
-    node.children.forEach((child, index) => {
-      const condition = `# Condition for ${child.label}`;
-      if (index === 0) { // First child is an if statement
-        code += "    ".repeat(depth) + `if ${condition}:\n`;
-      } else { // Subsequent children are elifs
-        code += "    ".repeat(depth) + `elif ${condition}:\n`;
-      }
-      traverse(child, depth + 1);
-    });
-  };
-
-  traverse(node);
-  return code;
-};
-
 export const useTree = () => useContext(TreeContext);
 
 export const TreeProvider = ({ children }) => {
@@ -36,29 +12,9 @@ export const TreeProvider = ({ children }) => {
   });
 
   const addNode = (parentId, newNode) => {
-    const addNodeRecursive = (node, parentId, newNode) => {
-      if (node.id === parentId) {
-        if (!node.children) {
-          node.children = [];
-        }
-        node.children.push(newNode);
-        return true; // Node added
-      } else if (node.children) {
-        for (let child of node.children) {
-          if (addNodeRecursive(child, parentId, newNode)) {
-            return true; // Node added
-          }
-        }
-      }
-      return false; // Node not added
-    };
-  
-    setTree((currentTree) => {
-      const newTree = { ...currentTree };
-      addNodeRecursive(newTree, parentId, newNode);
-      return newTree;
-    });
-  };  
+    // This function will add a new node to the tree
+    // Placeholder for now
+  };
 
   const editNode = (id, newLabel) => {
     // This function will edit an existing node's label
@@ -71,7 +27,7 @@ export const TreeProvider = ({ children }) => {
   };
 
   return (
-    <TreeContext.Provider value={{ tree, addNode, editNode, deleteNode, exportToPython }}>
+    <TreeContext.Provider value={{ tree, addNode, editNode, deleteNode }}>
       {children}
     </TreeContext.Provider>
   );
