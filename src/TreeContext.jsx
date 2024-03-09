@@ -26,6 +26,7 @@ const exportToPython = (node) => {
 };
 
 
+
 const TreeContext = createContext();
 
 export const useTree = () => useContext(TreeContext);
@@ -63,13 +64,44 @@ export const TreeProvider = ({ children }) => {
   };
   
   const editNode = (id, newLabel) => {
-    // This function will edit an existing node's label
-    // Placeholder for now
+    const editNodeRecursive = (node, id, newLabel) => {
+      if (node.id === id) {
+        node.label = newLabel;
+        return true;
+      } else if (node.children) {
+        for (let child of node.children) {
+          if (editNodeRecursive(child, id, newLabel)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+  
+    setTree((currentTree) => {
+      const newTree = { ...currentTree };
+      editNodeRecursive(newTree, id, newLabel);
+      return newTree;
+    });
   };
-
+  
   const deleteNode = (id) => {
-    // This function will delete a node from the tree
-    // Placeholder for now
+    const deleteNodeRecursive = (node, id) => {
+      node.children = node.children.filter(child => child.id !== id);
+      node.children.forEach(child => deleteNodeRecursive(child, id));
+    };
+  
+    setTree((currentTree) => {
+      if (currentTree.id === id) { // Prevent deleting the root node for simplicity
+        return currentTree;
+      }
+  
+      const newTree = { ...currentTree };
+      if (newTree.id !== id) {
+        deleteNodeRecursive(newTree, id);
+      }
+      return newTree;
+    });
   };
 
   return (
