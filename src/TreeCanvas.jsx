@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTree } from './TreeContext';
 
 function TreeCanvas() {
+  const { tree } = useTree();
+
   return (
     <div className="TreeCanvas">
-      {/* Future implementation of the decision tree canvas */}
-      Decision Tree Canvas Placeholder
+      <pre>{JSON.stringify(tree, null, 2)}</pre>
     </div>
   );
 }

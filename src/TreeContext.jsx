@@ -12,10 +12,30 @@ export const TreeProvider = ({ children }) => {
   });
 
   const addNode = (parentId, newNode) => {
-    // This function will add a new node to the tree
-    // Placeholder for now
+    const addNodeRecursive = (node, parentId, newNode) => {
+      if (node.id === parentId) {
+        if (!node.children) {
+          node.children = [];
+        }
+        node.children.push(newNode);
+        return true; // Node added
+      } else if (node.children) {
+        for (let child of node.children) {
+          if (addNodeRecursive(child, parentId, newNode)) {
+            return true; // Node added
+          }
+        }
+      }
+      return false; // Node not added
+    };
+  
+    setTree((currentTree) => {
+      const newTree = { ...currentTree };
+      addNodeRecursive(newTree, parentId, newNode);
+      return newTree;
+    });
   };
-
+  
   const editNode = (id, newLabel) => {
     // This function will edit an existing node's label
     // Placeholder for now
