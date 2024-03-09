@@ -1,5 +1,31 @@
 import React, { createContext, useContext, useState } from 'react';
 
+
+const exportToPython = (node) => {
+  let code = "";
+
+  const traverse = (node, depth = 0) => {
+    if (!node || !node.children || node.children.length === 0) {
+      code += "    ".repeat(depth) + `# Action for ${node.label}\n`;
+      return;
+    }
+
+    node.children.forEach((child, index) => {
+      const condition = `# Condition for ${child.label}`;
+      if (index === 0) { // First child is an if statement
+        code += "    ".repeat(depth) + `if ${condition}:\n`;
+      } else { // Subsequent children are elifs
+        code += "    ".repeat(depth) + `elif ${condition}:\n`;
+      }
+      traverse(child, depth + 1);
+    });
+  };
+
+  traverse(node);
+  return code;
+};
+
+
 const TreeContext = createContext();
 
 export const useTree = () => useContext(TreeContext);
@@ -47,8 +73,8 @@ export const TreeProvider = ({ children }) => {
   };
 
   return (
-    <TreeContext.Provider value={{ tree, addNode, editNode, deleteNode }}>
-      {children}
+    <TreeContext.Provider value={{ tree, addNode, editNode, deleteNode, exportToPython }}>
+    {children}
     </TreeContext.Provider>
   );
 };
