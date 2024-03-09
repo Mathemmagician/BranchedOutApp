@@ -2,18 +2,30 @@ import React from 'react';
 import { useTree } from './TreeContext';
 import NodeComponent from './NodeComponent';
 
-const renderTree = (node, onNodeSelect, onEdit, onDelete) => {
+const renderTree = (node, onNodeSelect, onAddChild, onEdit, onDelete) => {
   if (!node) return null;
   return (
     <div key={node.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <NodeComponent node={node} onNodeSelect={onNodeSelect} onEdit={onEdit} onDelete={onDelete} />
-      {node.children && node.children.map(child => renderTree(child, onNodeSelect, onEdit, onDelete))}
+      <NodeComponent node={node} onNodeSelect={onNodeSelect} onAddChild={onAddChild} onEdit={onEdit} onDelete={onDelete} />
+      {node.children && node.children.map(child => renderTree(child, onNodeSelect, onAddChild, onEdit, onDelete))}
     </div>
   );
 };
 
 function TreeCanvas() {
-  const { tree, editNode, deleteNode } = useTree();
+  const { tree, addNode, editNode, deleteNode } = useTree();
+
+  const handleAddChild = (parentId) => {
+    const nodeLabel = prompt("Enter node label:");
+    if (nodeLabel) {
+      const newNode = {
+        id: Date.now().toString(),
+        label: nodeLabel,
+        children: [],
+      };
+      addNode(parentId, newNode);
+    }
+  };
 
   const handleNodeSelect = (node) => {
     // Placeholder for node selection logic
@@ -36,7 +48,7 @@ function TreeCanvas() {
 
   return (
     <div className="TreeCanvas">
-      {renderTree(tree, handleNodeSelect, handleEditNode, handleDeleteNode)}
+      {renderTree(tree, handleNodeSelect, handleAddChild, handleEditNode, handleDeleteNode)}
     </div>
   );
 }
