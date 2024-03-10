@@ -13,11 +13,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.react-flow__node-valueNode {
-  font-size: 12px;
-  background: #888;
-  border: 1px solid #555;
+.react-flow__node-ifNode {
+  font-size: 15px;
+  /* background: #888; */
+  background-color: #242424;
+  border: 1px solid cyan;
   border-radius: 10px;
+  text-align: center;
+}
+
+.react-flow__node-valueNode {
+  font-size: 15px;
+  /* background: #888; */
+  background-color: #242424;
+  border: 1px solid orange;
+  border-radius: 100px;
   text-align: center;
 }
 

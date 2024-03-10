@@ -1,17 +1,14 @@
-import { memo } from 'react';
 import { Handle, Position, NodeToolbar } from 'reactflow';
  
 function ValueNode({ data }) {
   return (
     <>
       <NodeToolbar 
-        isVisible={true}
-        // isVisible={data.toolbarVisible} 
-        // position={data.toolbarPosition}
+        isVisible={data.toolbarVisible} 
         position={Position.Bottom}
       >
-        <button onClick={data.onAddChild} className='addButton'> Add </button>
-        <button onClick={data.onDelete} className='deleteButton'> Delete </button>
+        <button onClick={data.onTurnIntoIf} className='addButton'> Value {"=>"} IF </button>
+        {/* <button onClick={data.onDelete} className='deleteButton'> X </button> */}
       </NodeToolbar>
  
       <div style={{ padding: '10px 20px' }}>
@@ -19,7 +16,6 @@ function ValueNode({ data }) {
       </div>
  
       <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} />
     </>
   );
 };

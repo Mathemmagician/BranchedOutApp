@@ -50,9 +50,9 @@ function TreeCanvas() {
   return (
     <div>
 
-    <div className="TreeCanvas">
-      {renderTree(tree, handleNodeSelect, handleAddChild, handleEditNode, handleDeleteNode)}
-    </div>
+      {/* <div className="TreeCanvas">
+        {renderTree(tree, handleNodeSelect, handleAddChild, handleEditNode, handleDeleteNode)}
+      </div> */}
       <FlowCanvas />
     </div>
   );
