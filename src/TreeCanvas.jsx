@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTree } from './TreeContext';
 import NodeComponent from './NodeComponent';
+import { FlowCanvas } from './FlowCanvas';
 
 const renderTree = (node, onNodeSelect, onAddChild, onEdit, onDelete) => {
   if (!node) return null;
@@ -47,8 +48,12 @@ function TreeCanvas() {
   };
 
   return (
+    <div>
+
     <div className="TreeCanvas">
       {renderTree(tree, handleNodeSelect, handleAddChild, handleEditNode, handleDeleteNode)}
+    </div>
+      <FlowCanvas />
     </div>
   );
 }

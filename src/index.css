@@ -12,6 +12,37 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.react-flow__node-valueNode {
+  font-size: 12px;
+  background: #888;
+  border: 1px solid #555;
+  border-radius: 10px;
+  text-align: center;
+}
+
+
+.addButton {
+  background-color: green;
+  color: white;
+  margin: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none;
+}
+
+.deleteButton {
+  background-color: red;
+  color: white;
+  margin: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border: none;
+}
+
+
 /* 
 a {
   font-weight: 500;
