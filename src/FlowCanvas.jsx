@@ -16,8 +16,8 @@ const nodeTypes = {
 };
 
 const edgeTypes = {
-  flowEdge: FlowEdge
-}
+  flowEdge: FlowEdge,
+};
 
 const initialNodes = [
   {
@@ -140,6 +140,70 @@ export function FlowCanvas() {
     [setNodes, setEdges]
   );
 
+  const turnIfNodeIntoValueNode = useCallback(
+    (id) => {
+      // Confirm with the user
+      if (
+        !window.confirm(
+          "Are you sure you want to delete this IfNode and all its children?"
+        )
+      ) {
+        return;
+      }
+
+      setNodes((prevNodes) => {
+        let newNodeLabel = 'Converted Value Node'; // Default label
+
+        // Find the first edge connected to the IfNode to use its label for the new ValueNode
+        const connectedEdge = edges.find(e => e.source === id || e.target === id);
+        if (connectedEdge) {
+          newNodeLabel = connectedEdge.label; // Use the edge label if found
+        }
+    
+        const updatedNodes = prevNodes.map((node) => {
+          if (node.id === id) {
+            // Update the label when converting to a ValueNode
+            return { ...node, type: 'valueNode', data: { ...node.data, label: newNodeLabel } };
+          }
+          return node;
+        });
+
+        // Recursively find and remove all child nodes and their edges
+        const removeChildren = (nodeId, allNodes) => {
+          const children = allNodes.filter((n) =>
+            edges.find((e) => e.source === nodeId && e.target === n.id)
+          );
+          children.forEach((child) => {
+            removeChildren(child.id, allNodes);
+            const childIndex = allNodes.findIndex((n) => n.id === child.id);
+            if (childIndex >= 0) {
+              allNodes.splice(childIndex, 1);
+            }
+          });
+        };
+
+        removeChildren(id, updatedNodes);
+        return updatedNodes;
+      });
+
+      setEdges((prevEdges) => {
+        const allSubtreeNodeIds = new Set();
+        const collectSubtreeNodeIds = (nodeId) => {
+          allSubtreeNodeIds.add(nodeId);
+          const childNodes = prevEdges.filter(e => e.source === nodeId).map(e => e.target);
+          childNodes.forEach(collectSubtreeNodeIds);
+        };
+    
+        collectSubtreeNodeIds(id); // Start the collection with the current node being converted
+    
+        // Remove edges that are connected to the node and its subtree
+        return prevEdges.filter(edge => !allSubtreeNodeIds.has(edge.source) );
+      });
+    },
+    [setNodes, setEdges, nodes]
+  );
+
+  // Updating nodes to include the new function
   const updatedNodes = useMemo(
     () =>
       nodes.map((node) => ({
@@ -150,9 +214,13 @@ export function FlowCanvas() {
             node.type === "valueNode"
               ? () => turnValueNodeIntoIfNode(node.id)
               : undefined,
+          onTurnIntoValue:
+            node.type === "ifNode"
+              ? () => turnIfNodeIntoValueNode(node.id)
+              : undefined,
         },
       })),
-    [nodes, turnValueNodeIntoIfNode]
+    [nodes, turnValueNodeIntoIfNode, turnIfNodeIntoValueNode]
   );
 
   return (

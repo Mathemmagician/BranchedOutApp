@@ -9,7 +9,7 @@ function IfNode({ data }) {
         position={Position.Bottom}
       >
         {/* <button onClick={data.onAddChild} className='addButton'> Add </button> */}
-        <button onClick={data.onDelete} className='deleteButton'> Delete </button>
+        <button onClick={data.onTurnIntoValue} className='convertButton'>Delete</button>
       </NodeToolbar>
  
       <div style={{ padding: '15px 15px' }}>
