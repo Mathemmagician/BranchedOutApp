@@ -165,6 +165,9 @@ export function FlowCanvas() {
     // Assuming the root node has an ID of '1' or find it based on your logic
     const pythonCode = generatePythonCode("1");
     console.log(pythonCode);
+    navigator.clipboard.writeText(pythonCode).then(() => {
+      alert('Python code copied to clipboard (and printed to console)!');
+    });
   }, [nodes, edges]);
 
   // Function to convert a ValueNode into an IfNode and add children
