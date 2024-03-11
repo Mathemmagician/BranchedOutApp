@@ -1,14 +1,27 @@
-import React from 'react';
-import { useTree } from './TreeContext';
-import NodeComponent from './NodeComponent';
-import { FlowCanvas } from './FlowCanvas';
+import React from "react";
+import { ReactFlowProvider } from 'reactflow';
+import { useTree } from "./TreeContext";
+import NodeComponent from "./NodeComponent";
+import { FlowCanvas } from "./FlowCanvas";
 
 const renderTree = (node, onNodeSelect, onAddChild, onEdit, onDelete) => {
   if (!node) return null;
   return (
-    <div key={node.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <NodeComponent node={node} onNodeSelect={onNodeSelect} onAddChild={onAddChild} onEdit={onEdit} onDelete={onDelete} />
-      {node.children && node.children.map(child => renderTree(child, onNodeSelect, onAddChild, onEdit, onDelete))}
+    <div
+      key={node.label}
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      <NodeComponent
+        node={node}
+        onNodeSelect={onNodeSelect}
+        onAddChild={onAddChild}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+      {node.children &&
+        node.children.map((child) =>
+          renderTree(child, onNodeSelect, onAddChild, onEdit, onDelete)
+        )}
     </div>
   );
 };
@@ -30,7 +43,7 @@ function TreeCanvas() {
 
   const handleNodeSelect = (node) => {
     // Placeholder for node selection logic
-    console.log('Selected node:', node);
+    console.log("Selected node:", node);
   };
 
   const handleEditNode = (node) => {
@@ -49,11 +62,12 @@ function TreeCanvas() {
 
   return (
     <div>
-
       {/* <div className="TreeCanvas">
         {renderTree(tree, handleNodeSelect, handleAddChild, handleEditNode, handleDeleteNode)}
       </div> */}
-      <FlowCanvas />
+      <ReactFlowProvider>
+        <FlowCanvas />
+      </ReactFlowProvider>
     </div>
   );
 }

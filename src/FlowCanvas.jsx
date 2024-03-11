@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import ReactFlow, {
   useNodesState,
   useEdgesState,
+  useReactFlow,
   addEdge,
   MarkerType,
 } from "reactflow";
@@ -9,7 +10,8 @@ import "reactflow/dist/style.css";
 import ValueNode from "./ValueNode";
 import IfNode from "./IfNode";
 import FlowEdge from "./FlodEdge";
-import Toolbar from './Toolbar';
+import Toolbar from "./Toolbar";
+import Dagre from "@dagrejs/dagre";
 
 const nodeTypes = {
   valueNode: ValueNode,
@@ -61,49 +63,90 @@ const initialEdges = [
   },
 ];
 
+const getLayoutedElements = (nodes, edges, direction = "LR") => {
+  const dagreGraph = new Dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  dagreGraph.setGraph({ rankdir: direction });
+
+  edges.forEach((edge) => dagreGraph.setEdge(edge.source, edge.target));
+  nodes.forEach((node) =>
+    dagreGraph.setNode(node.id, { width: 200, height: 50 })
+  ); // Assume fixed size for simplicity
+
+  Dagre.layout(dagreGraph);
+
+  const layoutedNodes = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    return {
+      ...node,
+      position: { x: nodeWithPosition.x, y: nodeWithPosition.y },
+    };
+  });
+
+  return { nodes: layoutedNodes, edges };
+};
+
 export function FlowCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { fitView } = useReactFlow();
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
 
+  const onResetLayout = useCallback(() => {
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges);
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+
+    // Use requestAnimationFrame to ensure fitView works after nodes and edges have been updated
+    window.requestAnimationFrame(() => fitView({ padding: 0.2 }));
+  }, [nodes, edges, setNodes, setEdges, fitView]);
+
   const exportToPython = useCallback(() => {
-    const findNodeById = (id) => nodes.find(n => n.id === id);
-  
+    const findNodeById = (id) => nodes.find((n) => n.id === id);
+
     const generatePythonCode = (nodeId, depth = 0) => {
       const node = findNodeById(nodeId);
-      if (!node) return '';
-  
-      const indent = '    '.repeat(depth); // Create an indentation string based on the current depth
-      let code = '';
-  
-      if (node.type === 'ifNode') {
+      if (!node) return "";
+
+      const indent = "    ".repeat(depth); // Create an indentation string based on the current depth
+      let code = "";
+
+      if (node.type === "ifNode") {
         // Find the edges for the true and false branches of the if node
-        const trueEdge = edges.find(e => e.source === nodeId && e.label.toLowerCase() === 'true');
-        const falseEdge = edges.find(e => e.source === nodeId && e.label.toLowerCase() === 'false');
-  
+        const trueEdge = edges.find(
+          (e) => e.source === nodeId && e.label.toLowerCase() === "true"
+        );
+        const falseEdge = edges.find(
+          (e) => e.source === nodeId && e.label.toLowerCase() === "false"
+        );
+
         // Generate the Python code for the true and false branches recursively, increasing the depth
-        const trueBranchCode = trueEdge ? generatePythonCode(trueEdge.target, depth + 1) : '';
-        const falseBranchCode = falseEdge ? generatePythonCode(falseEdge.target, depth + 1) : '';
-  
+        const trueBranchCode = trueEdge
+          ? generatePythonCode(trueEdge.target, depth + 1)
+          : "";
+        const falseBranchCode = falseEdge
+          ? generatePythonCode(falseEdge.target, depth + 1)
+          : "";
+
         // Combine the code for the current if node with the code for its branches
         code += `${indent}if ${node.data.label}:\n${trueBranchCode}\n`;
         if (falseBranchCode) {
           code += `${indent}else:\n${falseBranchCode}`;
         }
-      } else if (node.type === 'valueNode') {
+      } else if (node.type === "valueNode") {
         // For value nodes, simply return the node's label with the correct indentation
         code += `${indent}# ${node.data.label}`;
       }
-  
+
       return code;
     };
-  
+
     // Assuming the root node has an ID of '1' or find it based on your logic
-    const pythonCode = generatePythonCode('1');
+    const pythonCode = generatePythonCode("1");
     console.log(pythonCode);
   }, [nodes, edges]);
 
@@ -271,7 +314,10 @@ export function FlowCanvas() {
 
   return (
     <div style={{ width: "700px", height: "800px" }}>
-      <Toolbar onExportToPython={exportToPython} />
+      <Toolbar
+        onExportToPython={exportToPython}
+        onResetLayout={onResetLayout}
+      />
       <ReactFlow
         nodes={updatedNodes}
         edges={edges}
@@ -280,7 +326,7 @@ export function FlowCanvas() {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        // fitView
+        fitView
       />
     </div>
   );
