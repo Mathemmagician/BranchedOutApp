@@ -9,6 +9,7 @@ import "reactflow/dist/style.css";
 import ValueNode from "./ValueNode";
 import IfNode from "./IfNode";
 import FlowEdge from "./FlodEdge";
+import Toolbar from './Toolbar';
 
 const nodeTypes = {
   valueNode: ValueNode,
@@ -68,6 +69,43 @@ export function FlowCanvas() {
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
+
+  const exportToPython = useCallback(() => {
+    const findNodeById = (id) => nodes.find(n => n.id === id);
+  
+    const generatePythonCode = (nodeId, depth = 0) => {
+      const node = findNodeById(nodeId);
+      if (!node) return '';
+  
+      const indent = '    '.repeat(depth); // Create an indentation string based on the current depth
+      let code = '';
+  
+      if (node.type === 'ifNode') {
+        // Find the edges for the true and false branches of the if node
+        const trueEdge = edges.find(e => e.source === nodeId && e.label.toLowerCase() === 'true');
+        const falseEdge = edges.find(e => e.source === nodeId && e.label.toLowerCase() === 'false');
+  
+        // Generate the Python code for the true and false branches recursively, increasing the depth
+        const trueBranchCode = trueEdge ? generatePythonCode(trueEdge.target, depth + 1) : '';
+        const falseBranchCode = falseEdge ? generatePythonCode(falseEdge.target, depth + 1) : '';
+  
+        // Combine the code for the current if node with the code for its branches
+        code += `${indent}if ${node.data.label}:\n${trueBranchCode}\n`;
+        if (falseBranchCode) {
+          code += `${indent}else:\n${falseBranchCode}`;
+        }
+      } else if (node.type === 'valueNode') {
+        // For value nodes, simply return the node's label with the correct indentation
+        code += `${indent}# ${node.data.label}`;
+      }
+  
+      return code;
+    };
+  
+    // Assuming the root node has an ID of '1' or find it based on your logic
+    const pythonCode = generatePythonCode('1');
+    console.log(pythonCode);
+  }, [nodes, edges]);
 
   // Function to convert a ValueNode into an IfNode and add children
   const turnValueNodeIntoIfNode = useCallback(
@@ -152,18 +190,24 @@ export function FlowCanvas() {
       }
 
       setNodes((prevNodes) => {
-        let newNodeLabel = 'Converted Value Node'; // Default label
+        let newNodeLabel = "Converted Value Node"; // Default label
 
         // Find the first edge connected to the IfNode to use its label for the new ValueNode
-        const connectedEdge = edges.find(e => e.source === id || e.target === id);
+        const connectedEdge = edges.find(
+          (e) => e.source === id || e.target === id
+        );
         if (connectedEdge) {
           newNodeLabel = connectedEdge.label; // Use the edge label if found
         }
-    
+
         const updatedNodes = prevNodes.map((node) => {
           if (node.id === id) {
             // Update the label when converting to a ValueNode
-            return { ...node, type: 'valueNode', data: { ...node.data, label: newNodeLabel } };
+            return {
+              ...node,
+              type: "valueNode",
+              data: { ...node.data, label: newNodeLabel },
+            };
           }
           return node;
         });
@@ -190,14 +234,16 @@ export function FlowCanvas() {
         const allSubtreeNodeIds = new Set();
         const collectSubtreeNodeIds = (nodeId) => {
           allSubtreeNodeIds.add(nodeId);
-          const childNodes = prevEdges.filter(e => e.source === nodeId).map(e => e.target);
+          const childNodes = prevEdges
+            .filter((e) => e.source === nodeId)
+            .map((e) => e.target);
           childNodes.forEach(collectSubtreeNodeIds);
         };
-    
+
         collectSubtreeNodeIds(id); // Start the collection with the current node being converted
-    
+
         // Remove edges that are connected to the node and its subtree
-        return prevEdges.filter(edge => !allSubtreeNodeIds.has(edge.source) );
+        return prevEdges.filter((edge) => !allSubtreeNodeIds.has(edge.source));
       });
     },
     [setNodes, setEdges, nodes]
@@ -225,6 +271,7 @@ export function FlowCanvas() {
 
   return (
     <div style={{ width: "700px", height: "800px" }}>
+      <Toolbar onExportToPython={exportToPython} />
       <ReactFlow
         nodes={updatedNodes}
         edges={edges}
