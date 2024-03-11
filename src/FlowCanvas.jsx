@@ -27,7 +27,7 @@ const initialNodes = [
     id: "1",
     type: "ifNode",
     position: { x: 10, y: 400 },
-    data: { label: "Height - 180cm >= 0" },
+    data: { label: "Height >= 180cm" },
   },
   {
     id: "2",
@@ -96,8 +96,25 @@ export function FlowCanvas() {
     [setEdges]
   );
 
+  const updateNodeLabel = useCallback(
+    (id, newLabel) => {
+      setNodes((prevNodes) =>
+        prevNodes.map((node) => {
+          if (node.id === id) {
+            return { ...node, data: { ...node.data, label: newLabel } };
+          }
+          return node;
+        })
+      );
+    },
+    [setNodes]
+  );
+
   const onResetLayout = useCallback(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges);
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      nodes,
+      edges
+    );
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
 
@@ -299,6 +316,7 @@ export function FlowCanvas() {
         ...node,
         data: {
           ...node.data,
+          updateNode: updateNodeLabel, // Add this line
           onTurnIntoIf:
             node.type === "valueNode"
               ? () => turnValueNodeIntoIfNode(node.id)
@@ -309,11 +327,11 @@ export function FlowCanvas() {
               : undefined,
         },
       })),
-    [nodes, turnValueNodeIntoIfNode, turnIfNodeIntoValueNode]
+    [nodes, turnValueNodeIntoIfNode, turnIfNodeIntoValueNode, updateNodeLabel]
   );
 
   return (
-    <div style={{ width: "700px", height: "800px" }}>
+    <div style={{ width: '80vw', height: '80vh' , }}>
       <Toolbar
         onExportToPython={exportToPython}
         onResetLayout={onResetLayout}

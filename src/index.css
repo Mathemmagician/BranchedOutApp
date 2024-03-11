@@ -13,6 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.nodrag {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 .react-flow__node-ifNode {
   font-size: 15px;
   /* background: #888; */
