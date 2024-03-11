@@ -52,7 +52,7 @@ function IfNode({ id, data }) {
       </div>
  
       <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} id="if" style={{ top: 10, background: '#555' }} />
+      <Handle type="source" position={Position.Right} id="if" style={{ top: 10, }} />
       <Handle type="source" position={Position.Right} id="else" style={{ bottom: 3, top: 'auto'}} />
     </>
   );
