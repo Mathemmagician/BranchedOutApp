@@ -50,7 +50,7 @@ function ValueNode({ id, data, }) {
         )}
       </div>
  
-      <Handle type="target" position={Position.Left} />
+      <Handle type="target" position={Position.Left} isConnectable={false} />
     </>
   );
 };

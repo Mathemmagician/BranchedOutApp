@@ -95,10 +95,10 @@ export function FlowCanvas() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { fitView } = useReactFlow();
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  // const onConnect = useCallback(
+  //   (params) => setEdges((eds) => addEdge(params, eds)),
+  //   [setEdges]
+  // );
 
   const updateNodeLabel = useCallback(
     (id, newLabel) => {
@@ -170,7 +170,7 @@ export function FlowCanvas() {
     const pythonCode = generatePythonCode("1");
     console.log(pythonCode);
     navigator.clipboard.writeText(pythonCode).then(() => {
-      alert('Python code copied to clipboard (and printed to console)!');
+      alert('Python pseudocode copied to clipboard (and printed to console)!');
     });
   }, [nodes, edges]);
 
@@ -352,10 +352,11 @@ export function FlowCanvas() {
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
+        // onConnect={onConnect}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
+        connect
       />
     </div>
   );
