@@ -139,10 +139,10 @@ export function FlowCanvas() {
       if (node.type === "ifNode") {
         // Find the edges for the true and false branches of the if node
         const trueEdge = edges.find(
-          (e) => e.source === nodeId && e.label.toLowerCase() === "true"
+          (e) => e.source === nodeId && e.label.toLowerCase().charAt(0) === "t"
         );
         const falseEdge = edges.find(
-          (e) => e.source === nodeId && e.label.toLowerCase() === "false"
+          (e) => e.source === nodeId && e.label.toLowerCase().charAt(0) === "f"
         );
 
         // Generate the Python code for the true and false branches recursively, increasing the depth
