@@ -49,7 +49,9 @@ const initialEdges = [
     source: "1",
     sourceHandle: "if",
     target: "2",
-    label: "True",
+    label: "T",
+    labelStyle: {fill: 'green', fontSize: 12},
+    labelBgStyle: { fill: '#242424', },
     markerEnd: {
       type: MarkerType.ArrowClosed,
     },
@@ -59,7 +61,9 @@ const initialEdges = [
     source: "1",
     sourceHandle: "else",
     target: "3",
-    label: "False",
+    label: "F",
+    labelStyle: {fill: 'red', fontSize: 12},
+    labelBgStyle: { fill: '#242424', },
   },
 ];
 
@@ -70,7 +74,7 @@ const getLayoutedElements = (nodes, edges, direction = "LR") => {
 
   edges.forEach((edge) => dagreGraph.setEdge(edge.source, edge.target));
   nodes.forEach((node) =>
-    dagreGraph.setNode(node.id, { width: 200, height: 50 })
+    dagreGraph.setNode(node.id, { width: 150, height: 50 })
   ); // Assume fixed size for simplicity
 
   Dagre.layout(dagreGraph);
@@ -223,7 +227,9 @@ export function FlowCanvas() {
           source: id,
           sourceHandle: "if",
           target: `value-${id}-true`,
-          label: "True",
+          label: "T",
+          labelStyle: {fill: 'green', fontSize: 12},
+          labelBgStyle: { fill: '#242424', },
           markerEnd: { type: MarkerType.ArrowClosed },
         };
         const falseEdge = {
@@ -231,7 +237,9 @@ export function FlowCanvas() {
           source: id,
           sourceHandle: "else",
           target: `value-${id}-false`,
-          label: "False",
+          label: "F",
+          labelStyle: {fill: 'red', fontSize: 12},
+          labelBgStyle: { fill: '#242424', },
           markerEnd: { type: MarkerType.ArrowClosed },
         };
 
